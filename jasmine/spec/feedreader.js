@@ -57,9 +57,7 @@ $(function() {
 
   describe('Initial Entries', function() {
     beforeEach(function(done) {
-      setTimeout(function() {
-        done();
-      }, 3000);
+      loadFeed(0, done);
     });
 
     it('exist in .feed container after feed is loaded', function(done) {
@@ -69,10 +67,21 @@ $(function() {
   });
 
   describe('New Feed Selection', function() {
+    var feedsBefore = [];
+    var feedsAfter = [];
+
     beforeEach(function(done) {
-      setTimeout(function() {
-        done();
-      }, 1000);
+      loadFeed(0, function() {
+        $('.feed').find('h2').each(function(idx, h2) {
+          feedsBefore.push(h2.textContent);
+        });
+        loadFeed(1, function() {
+          $('.feed').find('h2').each(function(idx, h2) {
+            feedsAfter.push(h2.textContent);
+          });
+          done();
+        });
+      });
     });
 
     it('changes feed content when a new feed is loaded', function(done) {
@@ -83,20 +92,9 @@ $(function() {
         return false;
       }
 
-      var feedsBefore = [];
-      $('.feed').find('h2').each(function(idx, h2) {
-        feedsBefore.push(h2.textContent);
-      });
-      loadFeed(1);
-      setTimeout(function() {
-        var feedsAfter = [];
-        $('.feed').find('h2').each(function(idx, h2) {
-          feedsAfter.push(h2.textContent);
-        });
-        expect(isDifferentFeeds(feedsBefore, feedsAfter)).toBe(true);
-        loadFeed(0);
-        done();
-      }, 3000);
+      expect(isDifferentFeeds(feedsBefore, feedsAfter)).toBe(true);
+      loadFeed(0);
+      done();
     });
   });
 }());
